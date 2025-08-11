@@ -1,13 +1,6 @@
 import type { FC } from "react";
-import { MoreHorizontal } from "lucide-react";
-
-type ApprovalItem = {
-  id: string;
-  name: string;
-  vehicleType: string;
-  date: string; // e.g. 04/17/23 at 8:25 PM
-  avatarUrl: string;
-};
+import { MoveRight } from "lucide-react";
+import { ApprovalRequestsCard, type ApprovalItem } from "./ApprovalRequestCard";
 
 const items: ApprovalItem[] = [
   {
@@ -43,29 +36,20 @@ const items: ApprovalItem[] = [
 export const ApprovalRequests: FC = () => {
   return (
     <section>
-      <div className="flex items-center justify-between mb-3">
+      <div className="mb-3">
         <h3 className="text-lg font-semibold">Approval Requests</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="  text-gray-400">
+            Manage your markets location and other informations.
+          </h3>
+          <div className="bg-gray-100 rounded-lg px-1 hover:bg-gray-200 cursor-pointer">
+            <MoveRight className="text-gray-500 w-4" />
+          </div>
+        </div>
       </div>
       <div className="space-y-3">
         {items.map((item) => (
-          <div
-            key={item.id}
-            className="bg-white rounded-2xl border p-4 flex items-center gap-3"
-          >
-            <img
-              src={item.avatarUrl}
-              alt="avatar"
-              className="w-10 h-10 rounded-full"
-            />
-            <div className="flex-1">
-              <div className="font-medium">{item.name}</div>
-              <div className="text-xs text-gray-500">{item.date}</div>
-            </div>
-            <div className="text-sm text-gray-700">{item.vehicleType}</div>
-            <button className="p-2 rounded-lg hover:bg-gray-100">
-              <MoreHorizontal className="w-4 h-4" />
-            </button>
-          </div>
+          <ApprovalRequestsCard key={item.id} {...item} />
         ))}
       </div>
     </section>
