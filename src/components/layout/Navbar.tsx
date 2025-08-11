@@ -1,24 +1,25 @@
 import type { FC } from "react";
-import { Bell, Menu, Search } from "lucide-react";
+import { Bell, Menu, PanelRightOpen, Search } from "lucide-react";
 
 type NavbarProps = {
   onToggleSidebar: () => void;
   collapsed: boolean;
 };
 
-export const Navbar: FC<NavbarProps> = ({ onToggleSidebar }) => {
+export const Navbar: FC<NavbarProps> = ({ onToggleSidebar, collapsed }) => {
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b z-50">
+    <header className="fixed top-0 left-0 right-0 h-16 bg-white z-50">
       <div className="h-full px-4 flex items-center gap-4">
-        <button
-          aria-label="Toggle sidebar"
-          onClick={onToggleSidebar}
-          className="p-2 rounded-lg hover:bg-gray-100"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-
-        <div className="font-bold text-xl text-primary">VoomGo</div>
+        <div className="flex justify-between w-56">
+          <div className="font-bold text-xl text-primary">VoomGo</div>
+          <button
+            aria-label="Toggle sidebar"
+            onClick={onToggleSidebar}
+            className="p-2 rounded-lg hover:bg-gray-100"
+          >
+            {!collapsed && <PanelRightOpen className="w-5 h-5" />}
+          </button>
+        </div>
 
         <div className="hidden md:flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2 w-full max-w-xl mx-auto">
           <Search className="w-4 h-4 text-gray-500" />
