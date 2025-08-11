@@ -13,15 +13,17 @@ import {
 } from "lucide-react";
 import type { NavItemType, SidebarProps } from "../../types/NavTypes";
 import { NavChildItem, NavItem } from "../nav/NavItem";
+import { useNavigate } from "react-router-dom";
 
 export const Sidebar: FC<SidebarProps> = ({ collapsed, onToggle }) => {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [selectedItem, setSelectedItem] = useState<string>("Dashboard");
+  const navigate = useNavigate();
 
   const width = collapsed ? "w-20" : "w-64";
 
   const navItems: NavItemType[] = [
-    { name: "Dashboard", icon: <House />, path: "/dashboard" },
+    { name: "Dashboard", icon: <House />, path: "/" },
     {
       name: "User Management",
       icon: <Users />,
@@ -69,6 +71,8 @@ export const Sidebar: FC<SidebarProps> = ({ collapsed, onToggle }) => {
         }
         return newSet;
       });
+    } else if (item.path) {
+      navigate(item.path);
     }
 
     // Set selected item for all items (with or without children)
@@ -77,8 +81,7 @@ export const Sidebar: FC<SidebarProps> = ({ collapsed, onToggle }) => {
 
   const handleChildClick = (childName: string, childPath: string) => {
     setSelectedItem(childName);
-    console.log(childPath);
-    // You can add navigation logic here
+    if (childPath) navigate(childPath);
   };
 
   const renderNavItems = (items: NavItemType[]) => {

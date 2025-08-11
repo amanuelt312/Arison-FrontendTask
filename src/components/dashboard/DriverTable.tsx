@@ -1,10 +1,11 @@
 import type { FC } from "react";
 import { useState } from "react";
-import Button from "../ui/Button";
 import { SearchInput } from "../ui/SearchInput";
 import { Header } from "../ui/Header";
 import { Eye, Trash2, FileUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { StatusBadge, type DriverStatus } from "./StatusBadge";
+import { useNavigate } from "react-router-dom";
+import SuspensionModal from "./SuspensionModal";
 
 export type Driver = {
   id: string;
@@ -86,6 +87,9 @@ export const DriverTable: FC = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [suspendOpen, setSuspendOpen] = useState(false);
+  const [selectedDriverName, setSelectedDriverName] = useState<string>("");
+  const navigate = useNavigate();
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -94,6 +98,15 @@ export const DriverTable: FC = () => {
       setSortField(field);
       setSortDirection("asc");
     }
+  };
+
+  const handleRowClick = (id: string) => {
+    navigate(`/drivers/${id}`);
+  };
+
+  const openSuspend = (name: string) => {
+    setSelectedDriverName(name);
+    setSuspendOpen(true);
   };
 
   const filtered = mockDrivers.filter((d) => {
@@ -150,7 +163,7 @@ export const DriverTable: FC = () => {
 
   return (
     <section className="mt-6">
-      <div className="bg-white rounded-2xl border p-4">
+      <div className="bg-white rounded-2xl border border-gray-300 shadow p-4">
         <div className="flex items-center gap-3 flex-wrap">
           <div className="w-xl">
             <SearchInput
@@ -169,7 +182,7 @@ export const DriverTable: FC = () => {
         </div>
 
         <div className="mt-4 overflow-x-auto">
-          <div className="flex items-center justify-between w-full border rounded-xl px-2 py-2">
+          <div className="flex items-center justify-between w-full border border-gray-300 shadow rounded-xl px-2 py-2">
             {tabs.map((t) => (
               <button
                 key={t.key}
@@ -223,16 +236,24 @@ export const DriverTable: FC = () => {
                   isActive={sortField === "status"}
                   onClick={() => handleSort("status")}
                 />
-                <th className="py-3 px-2 rounded-tr-xl">Action</th>
+                <Header
+                  label="Action"
+                  sortable={false}
+                  isActive={sortField === "action"}
+                  onClick={() => handleSort("action")}
+                />
               </tr>
             </thead>
             <tbody>
               {sortedDrivers.map((d) => (
-                <tr key={d.id} className="text-gray-500">
+                <tr key={d.id} className="text-gray-500 hover:bg-gray-50 group">
                   <td className="py-3 px-2">
                     <input type="checkbox" />
                   </td>
-                  <td className="py-3 px-2">
+                  <td
+                    className="py-3 px-2 cursor-pointer"
+                    onClick={() => handleRowClick(d.id)}
+                  >
                     <div className="flex items-center gap-3">
                       <img
                         src={d.avatarUrl}
@@ -254,14 +275,15 @@ export const DriverTable: FC = () => {
                   <td className="py-3 px-2">
                     <div className="flex items-center gap-2 text-gray-600">
                       <button
-                        className="p-2 hover:bg-gray-100 rounded-lg"
-                        title="View"
+                        className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer"
+                        title="Suspend"
+                        onClick={() => openSuspend(d.name)}
                       >
                         <Eye className="w-4 h-4 text-gray-500" />
                       </button>
 
                       <button
-                        className="p-2 hover:bg-gray-100 rounded-lg"
+                        className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer"
                         title="Delete"
                       >
                         <Trash2 className="w-4 h-4 text-gray-500" />
@@ -305,6 +327,11 @@ export const DriverTable: FC = () => {
           </div>
         </div>
       </div>
+      <SuspensionModal
+        open={suspendOpen}
+        onClose={() => setSuspendOpen(false)}
+        driverName={selectedDriverName}
+      />
     </section>
   );
 };

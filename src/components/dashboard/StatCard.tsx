@@ -1,7 +1,7 @@
 import { EllipsisVertical } from "lucide-react";
 import type { FC, ReactNode } from "react";
 
-type StatCardProps = {
+export type StatCardProps = {
   title: string;
   value: string | number;
   subtitle?: string;
@@ -22,7 +22,7 @@ export const StatCard: FC<StatCardProps> = ({
   const isPrimary = variant === "primary";
   return (
     <div
-      className={`rounded-xl border pb-10 ${
+      className={`rounded-xl border border-bordercolor shadow pb-10 ${
         isPrimary ? "bg-primary text-white border-primary" : "bg-white"
       } p-3 ${className}`}
     >

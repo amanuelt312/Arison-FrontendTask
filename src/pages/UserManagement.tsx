@@ -4,7 +4,7 @@ import DriverOverview from "../components/dashboard/DriverOverview";
 import ApprovalRequests from "../components/dashboard/ApprovalRequests";
 import DriverTable from "../components/dashboard/DriverTable";
 
-const Dashboard: FC = () => {
+const UserManagement: FC = () => {
   return (
     <AppLayout>
       <div className="max-w-[1400px] mx-auto">
@@ -27,4 +27,4 @@ const Dashboard: FC = () => {
   );
 };
 
-export default Dashboard;
+export default UserManagement;

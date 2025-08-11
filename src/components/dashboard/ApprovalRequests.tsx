@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import { MoveRight } from "lucide-react";
 import { ApprovalRequestsCard, type ApprovalItem } from "./ApprovalRequestCard";
+import { useNavigate } from "react-router-dom";
 
 const items: ApprovalItem[] = [
   {
@@ -34,6 +35,7 @@ const items: ApprovalItem[] = [
 ];
 
 export const ApprovalRequests: FC = () => {
+  const navigate = useNavigate();
   return (
     <section>
       <div className="mb-3">
@@ -49,7 +51,11 @@ export const ApprovalRequests: FC = () => {
       </div>
       <div className="space-y-3">
         {items.map((item) => (
-          <ApprovalRequestsCard key={item.id} {...item} />
+          <ApprovalRequestsCard
+            key={item.id}
+            {...item}
+            onClick={() => navigate(`/driver-approval/${item.id}`)}
+          />
         ))}
       </div>
     </section>
