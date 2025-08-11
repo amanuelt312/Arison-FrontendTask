@@ -4,9 +4,9 @@ export type DriverStatus = "Available" | "Offline" | "Suspended";
 
 export const StatusBadge: FC<{ status: DriverStatus }> = ({ status }) => {
   const styles: Record<DriverStatus, string> = {
-    Available: "bg-success/10 text-success border-success/30",
-    Offline: "bg-gray-100 text-gray-600 border-gray-200",
-    Suspended: "bg-danger/10 text-danger border-danger/30",
+    Available: "bg-success/10 text-green-600 border-success/30 ",
+    Offline: "bg-gray-100 text-gray-600 border-gray-200 ",
+    Suspended: "bg-danger/10 text-danger border-danger/30 ",
   };
 
   return (

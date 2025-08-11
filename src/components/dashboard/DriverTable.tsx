@@ -1,8 +1,9 @@
 import type { FC } from "react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Button from "../ui/Button";
-import { Input } from "../ui/Input";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { SearchInput } from "../ui/SearchInput";
+import { Header } from "../ui/Header";
+import { Eye, Trash2, FileUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { StatusBadge, type DriverStatus } from "./StatusBadge";
 
 export type Driver = {
@@ -83,46 +84,100 @@ const tabs = [
 export const DriverTable: FC = () => {
   const [query, setQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const filtered = useMemo(() => {
-    return mockDrivers.filter((d) => {
-      const inQuery = `${d.id} ${d.name} ${d.phone}`
-        .toLowerCase()
-        .includes(query.toLowerCase());
-      // Keeping tab behavior simple for mock
-      return inQuery;
-    });
-  }, [query]);
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const filtered = mockDrivers.filter((d) => {
+    const inQuery = `${d.id} ${d.name} ${d.phone}`
+      .toLowerCase()
+      .includes(query.toLowerCase());
+    return inQuery;
+  });
+
+  const sortedDrivers = [...filtered].sort((a, b) => {
+    if (!sortField) return 0;
+
+    let aValue: string | number;
+    let bValue: string | number;
+
+    switch (sortField) {
+      case "id":
+        aValue = a.id;
+        bValue = b.id;
+        break;
+      case "name":
+        aValue = a.name.toLowerCase();
+        bValue = b.name.toLowerCase();
+        break;
+      case "phone":
+        aValue = a.phone;
+        bValue = b.phone;
+        break;
+      case "carType":
+        aValue = a.carType.toLowerCase();
+        bValue = b.carType.toLowerCase();
+        break;
+      case "dateCreated":
+        aValue = new Date(a.dateCreated).getTime();
+        bValue = new Date(b.dateCreated).getTime();
+        break;
+      case "status":
+        aValue = a.status.toLowerCase();
+        bValue = b.status.toLowerCase();
+        break;
+      default:
+        return 0;
+    }
+
+    if (sortDirection === "asc") {
+      return aValue > bValue ? 1 : -1;
+    } else {
+      return aValue < bValue ? 1 : -1;
+    }
+  });
+
+  const isFirstPage = true;
+  const isLastPage = false;
 
   return (
     <section className="mt-6">
       <div className="bg-white rounded-2xl border p-4">
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex-1 min-w-[260px]">
-            <Input
-              label="Search"
+          <div className="w-xl">
+            <SearchInput
               placeholder="Search for id, name, phone number"
-              type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              error=""
+              size="lg"
             />
           </div>
           <div className="ml-auto">
-            <Button size="md">Export</Button>
+            <div className="flex items-center gap-2 border border-gray-400 shadow p-2 rounded-xl cursor-pointer hover:bg-gray-100">
+              <FileUp className="h-4 w-4" />
+              <span className="text-sm">Export</span>
+            </div>
           </div>
         </div>
 
         <div className="mt-4 overflow-x-auto">
-          <div className="flex items-center gap-2 min-w-max">
+          <div className="flex items-center justify-between w-full border rounded-xl px-2 py-2">
             {tabs.map((t) => (
               <button
                 key={t.key}
                 onClick={() => setActiveTab(t.key)}
-                className={`px-3 py-2 rounded-full text-sm border ${
+                className={`text-sm font-bold px-2 py-1 rounded-2xl cursor-pointer ${
                   activeTab === t.key
-                    ? "bg-primary text-white border-primary"
-                    : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                    ? "bg-primary/10 text-primary"
+                    : "text-gray-400 hover:bg-gray-100"
                 }`}
               >
                 {t.label} ({t.count})
@@ -133,22 +188,47 @@ export const DriverTable: FC = () => {
 
         <div className="mt-4 overflow-auto">
           <table className="w-full text-sm">
-            <thead>
+            <thead className="bg-gray-100">
               <tr className="text-left text-gray-500">
-                <th className="py-3 px-2 w-10">
+                <th className="py-3 px-2 w-10 rounded-tl-xl">
                   <input type="checkbox" />
                 </th>
-                <th className="py-3 px-2">Driver Id & Name</th>
-                <th className="py-3 px-2">Phone Number</th>
-                <th className="py-3 px-2">Car Type</th>
-                <th className="py-3 px-2">Date Created</th>
-                <th className="py-3 px-2">Status</th>
-                <th className="py-3 px-2">Action</th>
+                <Header
+                  label="Driver Id & Name"
+                  sortable
+                  isActive={sortField === "id"}
+                  onClick={() => handleSort("id")}
+                />
+                <Header
+                  label="Phone Number"
+                  sortable
+                  isActive={sortField === "phone"}
+                  onClick={() => handleSort("phone")}
+                />
+                <Header
+                  label="Car Type"
+                  sortable
+                  isActive={sortField === "carType"}
+                  onClick={() => handleSort("carType")}
+                />
+                <Header
+                  label="Date Created"
+                  sortable
+                  isActive={sortField === "dateCreated"}
+                  onClick={() => handleSort("dateCreated")}
+                />
+                <Header
+                  label="Status"
+                  sortable
+                  isActive={sortField === "status"}
+                  onClick={() => handleSort("status")}
+                />
+                <th className="py-3 px-2 rounded-tr-xl">Action</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((d) => (
-                <tr key={d.id} className="border-t">
+              {sortedDrivers.map((d) => (
+                <tr key={d.id} className="text-gray-500">
                   <td className="py-3 px-2">
                     <input type="checkbox" />
                   </td>
@@ -161,7 +241,7 @@ export const DriverTable: FC = () => {
                       />
                       <div>
                         <div className="text-xs text-primary">{d.id}</div>
-                        <div className="font-medium">{d.name}</div>
+                        <div className="">{d.name}</div>
                       </div>
                     </div>
                   </td>
@@ -177,19 +257,14 @@ export const DriverTable: FC = () => {
                         className="p-2 hover:bg-gray-100 rounded-lg"
                         title="View"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="w-4 h-4 text-gray-500" />
                       </button>
-                      <button
-                        className="p-2 hover:bg-gray-100 rounded-lg"
-                        title="Edit"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
+
                       <button
                         className="p-2 hover:bg-gray-100 rounded-lg"
                         title="Delete"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4 text-gray-500" />
                       </button>
                     </div>
                   </td>
@@ -198,14 +273,34 @@ export const DriverTable: FC = () => {
             </tbody>
           </table>
           <div className="flex items-center justify-between text-sm text-gray-600 mt-4">
-            <div>1 - {filtered.length} of 13 Pages</div>
+            <div>
+              <span className="text-black">1</span> of 13 Pages
+            </div>
             <div className="flex items-center gap-2">
-              <span>Show</span>
-              <select className="border rounded-lg px-2 py-1">
-                <option>10</option>
-                <option>20</option>
-                <option>50</option>
-              </select>
+              <div className="flex items-center gap-2">
+                <span>Show</span>
+                <select className="border rounded-lg p-1">
+                  <option>10</option>
+                  <option>20</option>
+                  <option>50</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="p-1 border rounded-lg">
+                  <ChevronLeft
+                    className={`h-4 w-4 ${
+                      isFirstPage ? "text-gray-300" : "text-black"
+                    }`}
+                  />
+                </div>
+                <div className="p-1 border rounded-lg">
+                  <ChevronRight
+                    className={`h-4 w-4 ${
+                      isLastPage ? "text-gray-300" : "text-black"
+                    }`}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>

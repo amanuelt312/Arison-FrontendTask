@@ -36,9 +36,7 @@ export const NavItem: FC<{
         <>
           <span
             className={`truncate flex-1 ${
-              active || isParentActive
-                ? "text-primary font-semibold "
-                : "text-gray-400 text-sm"
+              active || isParentActive ? "text-primary " : "text-gray-400 "
             }`}
           >
             {item.name}

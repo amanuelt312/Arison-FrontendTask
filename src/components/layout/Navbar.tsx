@@ -1,12 +1,7 @@
 import type { FC } from "react";
-import {
-  Bell,
-  Mail,
-  Menu,
-  MessageCircle,
-  PanelRightOpen,
-  Search,
-} from "lucide-react";
+import { useState } from "react";
+import { Bell, PanelRightOpen, Mail } from "lucide-react";
+import { SearchInput } from "../ui/SearchInput";
 
 type NavbarProps = {
   onToggleSidebar: () => void;
@@ -14,6 +9,8 @@ type NavbarProps = {
 };
 
 export const Navbar: FC<NavbarProps> = ({ onToggleSidebar, collapsed }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white z-50">
       <div className="h-full px-4 flex items-center gap-4">
@@ -28,11 +25,12 @@ export const Navbar: FC<NavbarProps> = ({ onToggleSidebar, collapsed }) => {
           </button>
         </div>
 
-        <div className="hidden md:flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2 w-full max-w-xl mx-auto">
-          <Search className="w-4 h-4 text-gray-500" />
-          <input
-            className="bg-transparent outline-none w-full text-sm"
+        <div className="hidden md:flex items-center gap-2 w-full max-w-xl mx-auto">
+          <SearchInput
             placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full"
           />
         </div>
         <div className="flex items-center gap-2">
