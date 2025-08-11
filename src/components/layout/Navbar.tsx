@@ -1,5 +1,12 @@
 import type { FC } from "react";
-import { Bell, Menu, PanelRightOpen, Search } from "lucide-react";
+import {
+  Bell,
+  Mail,
+  Menu,
+  MessageCircle,
+  PanelRightOpen,
+  Search,
+} from "lucide-react";
 
 type NavbarProps = {
   onToggleSidebar: () => void;
@@ -28,11 +35,25 @@ export const Navbar: FC<NavbarProps> = ({ onToggleSidebar, collapsed }) => {
             placeholder="Search"
           />
         </div>
-
-        <button className="ml-auto p-2 rounded-lg hover:bg-gray-100">
-          <Bell className="w-5 h-5" />
-        </button>
-
+        <div className="flex items-center gap-2">
+          <div className="relative bg-gray-100 rounded-full ">
+            <button className="ml-auto p-2 rounded-lg hover:bg-gray-100">
+              <Mail className="w-5 h-5" />
+            </button>
+            <span className="absolute -top-1 -right-1 bg-danger text-white text-xs  rounded-full w-4 h-4 flex items-center justify-center">
+              2
+            </span>
+          </div>
+          <div className="relative bg-gray-100 rounded-full ">
+            <button className="ml-auto p-2 rounded-lg hover:bg-gray-100">
+              <Bell className="w-5 h-5" />
+            </button>
+            <span className="absolute -top-1 -right-1 bg-danger text-white text-xs  rounded-full w-4 h-4 flex items-center justify-center">
+              2
+            </span>
+          </div>
+        </div>
+        <div className="h-[60%] w-px bg-gray-300"></div>
         <div className="flex items-center gap-3">
           <img
             src="https://i.pravatar.cc/40?img=12"
