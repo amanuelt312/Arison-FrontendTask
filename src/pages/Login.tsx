@@ -1,15 +1,41 @@
 import { useState } from "react";
 import { Input } from "../components/ui/Input";
-import { Check, CheckCheck } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Check } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/ui/Button";
+import { useMutation } from "@tanstack/react-query";
+import { apiFetch } from "../lib/api";
+import { useAuthStore } from "../store/auth";
+import type { LoginResponse } from "../types/auth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const setAuth = useAuthStore((s) => s.setAuth);
+  const navigate = useNavigate();
 
   const isValidEmail = email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+
+  const loginMutation = useMutation({
+    mutationFn: async () => {
+      return apiFetch<LoginResponse>("/api/v1/auth/admin/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+        skipAuth: true,
+      });
+    },
+    onSuccess: (data) => {
+      setAuth(data);
+      navigate("/user-management", { replace: true });
+    },
+  });
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) return;
+    loginMutation.mutate();
+  };
 
   return (
     <div className="flex items-center justify-center  min-h-screen ">
@@ -20,7 +46,7 @@ const Login = () => {
           </h1>
         </div>
 
-        <div className="mt-10 space-y-5">
+        <form onSubmit={onSubmit} className="mt-10 space-y-5">
           <Input
             label="Email Address"
             placeholder="Enter your email"
@@ -62,9 +88,20 @@ const Login = () => {
             </Link>
           </div>
           <div>
-            <Button className="w-full">Log in</Button>
+            <Button
+              className="w-full"
+              loading={loginMutation.isPending}
+              disabled={!email || !password || loginMutation.isPending}
+            >
+              {loginMutation.isPending ? "Logging in..." : "Log in"}
+            </Button>
+            {loginMutation.isError ? (
+              <p className="text-danger text-sm mt-2">
+                {(loginMutation.error as Error)?.message || "Login failed"}
+              </p>
+            ) : null}
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

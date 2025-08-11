@@ -10,15 +10,21 @@ import {
   ChartNoAxesCombined,
   Trophy,
   House,
+  ChevronDown,
 } from "lucide-react";
 import type { NavItemType, SidebarProps } from "../../types/NavTypes";
 import { NavChildItem, NavItem } from "../nav/NavItem";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../store/auth";
+import { apiFetch } from "../../lib/api";
 
 export const Sidebar: FC<SidebarProps> = ({ collapsed, onToggle }) => {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [selectedItem, setSelectedItem] = useState<string>("Dashboard");
+  const [profileOpen, setProfileOpen] = useState(false);
   const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
+  const clearAuth = useAuthStore((s) => s.clearAuth);
 
   const width = collapsed ? "w-20" : "w-64";
 
@@ -28,7 +34,7 @@ export const Sidebar: FC<SidebarProps> = ({ collapsed, onToggle }) => {
       name: "User Management",
       icon: <Users />,
       children: [
-        { name: "Riders", path: "/riders" },
+        { name: "Riders", path: "/drivers" },
         { name: "Drivers", path: "/drivers" },
       ],
     },
@@ -82,6 +88,22 @@ export const Sidebar: FC<SidebarProps> = ({ collapsed, onToggle }) => {
   const handleChildClick = (childName: string, childPath: string) => {
     setSelectedItem(childName);
     if (childPath) navigate(childPath);
+  };
+
+  const handleLogout = async () => {
+    try {
+      if (user?._id) {
+        await apiFetch("/api/v1/auth/logout", {
+          method: "POST",
+          body: JSON.stringify({ userId: user._id }),
+        });
+      }
+    } catch (_) {
+      // ignore API error during logout
+    } finally {
+      clearAuth();
+      navigate("/login", { replace: true });
+    }
   };
 
   const renderNavItems = (items: NavItemType[]) => {
@@ -156,8 +178,47 @@ export const Sidebar: FC<SidebarProps> = ({ collapsed, onToggle }) => {
       >
         {!collapsed ? "TOOLS" : ""}
       </div>
-      <div className="px-2 space-y-2 flex-1 overflow-y-auto">
-        {renderNavItems(ToolItems)}
+      <div className="px-2 space-y-2 flex-1 ">{renderNavItems(ToolItems)}</div>
+      <div className="flex flex-col gap-2">
+        <div className="flex justify-between px-2 flex-1">
+          <div className="flex items-center justify-center gap-3 relative">
+            <button
+              onClick={() => setProfileOpen((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={profileOpen}
+            >
+              <img
+                src="https://i.pravatar.cc/40?img=12"
+                alt="User avatar"
+                className="w-9 h-9 rounded-full"
+              />
+            </button>
+            <div className="hidden sm:block leading-tight">
+              <div className="text-sm font-semibold">
+                {user?.fullName || ""}
+              </div>
+              <div className="text-xs text-gray-500">{user?.role || ""}</div>
+            </div>
+          </div>
+
+          <div
+            className="flex items-center justify-center cursor-pointer hover:text-gray-700"
+            onClick={() => setProfileOpen((v) => !v)}
+          >
+            <ChevronDown />
+          </div>
+        </div>
+        {profileOpen && (
+          <div className=" bg-white border border-gray-200 rounded-md shadow-md  w-full">
+            <button
+              className="w-full text-left px-4 py-2 text-danger hover:bg-gray-50"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

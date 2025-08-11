@@ -2,7 +2,9 @@ import type { FC } from "react";
 import { useState } from "react";
 import { Bell, PanelRightOpen, Mail } from "lucide-react";
 import { SearchInput } from "../ui/SearchInput";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../store/auth";
+import { apiFetch } from "../../lib/api";
 
 type NavbarProps = {
   onToggleSidebar: () => void;
@@ -11,10 +13,30 @@ type NavbarProps = {
 
 export const Navbar: FC<NavbarProps> = ({ onToggleSidebar, collapsed }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
+  const clearAuth = useAuthStore((s) => s.clearAuth);
+
+  const handleLogout = async () => {
+    try {
+      if (user?._id) {
+        await apiFetch("/api/v1/auth/logout", {
+          method: "POST",
+          body: JSON.stringify({ userId: user._id }),
+        });
+      }
+    } catch (_) {
+      // ignore API error during logout
+    } finally {
+      clearAuth();
+      navigate("/login", { replace: true });
+    }
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white z-50">
-      <div className="h-full px-4 flex items-center gap-4">
+      <div className="h-full px-4 flex items-center gap-4 relative">
         <div className="flex justify-between w-56">
           <Link to={"/"}>
             <div className="font-bold text-xl text-primary">VoomGo</div>
@@ -56,16 +78,46 @@ export const Navbar: FC<NavbarProps> = ({ onToggleSidebar, collapsed }) => {
           </div>
         </div>
         <div className="h-[60%] w-px bg-gray-300"></div>
-        <div className="flex items-center justify-end gap-3 shrink-0">
-          <img
-            src="https://i.pravatar.cc/40?img=12"
-            alt="User avatar"
-            className="w-9 h-9 rounded-full"
-          />
-          <div className="hidden sm:block leading-tight">
-            <div className="text-sm font-semibold">Mensur M.</div>
-            <div className="text-xs text-gray-500">Super Admin</div>
+        <div className="flex items-center justify-end gap-3 shrink-0 relative">
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            onBlur={() => setMenuOpen(false)}
+            className="cursor-pointer"
+          >
+            <img
+              src="https://i.pravatar.cc/40?img=12"
+              alt="User avatar"
+              className="w-9 h-9 rounded-full"
+            />
+          </button>
+          <div
+            className="hidden sm:block leading-tight cursor-pointer"
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            <div className="text-sm font-semibold">{user?.fullName || ""}</div>
+            <div className="text-xs text-gray-500">{user?.role || ""}</div>
           </div>
+
+          {menuOpen && (
+            <div className="absolute top-12 right-0 bg-white border border-gray-200 rounded-md shadow-md py-2 w-40">
+              <button
+                className="w-full text-left px-4 py-2 hover:bg-gray-50"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => navigate("/user-management")}
+              >
+                Dashboard
+              </button>
+              <button
+                className="w-full text-left px-4 py-2 text-danger hover:bg-gray-50"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

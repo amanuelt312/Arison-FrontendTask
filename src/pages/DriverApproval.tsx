@@ -6,16 +6,10 @@ import {
   type ApprovalItem,
 } from "../components/dashboard/ApprovalRequestCard";
 import {
-  Car,
   CheckCircle2,
   CircleX,
   FileText,
   FileArchive,
-  Mail,
-  MapPin,
-  MoreVertical,
-  Phone,
-  CalendarClock,
   Trash,
 } from "lucide-react";
 
