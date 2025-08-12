@@ -224,22 +224,22 @@ export const DriverTable: FC = () => {
                         <input type="checkbox" />
                       </td>
                       <td
-                        className="py-3 px-2 cursor-pointer"
+                        className="py-3 px-2  "
                         onClick={() => handleRowClick(d.id)}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex  items-center gap-3">
                           <img
                             src={d.avatarUrl || PLACEHOLDER_IMAGE}
                             alt="avatar"
                             className="w-9 h-9 rounded-md object-cover"
                           />
-                          <div>
+                          <div className="">
                             <div className="text-xs text-primary">{d.id}</div>
                             <div className="">{d.name}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="py-3 px-2">{d.phone}</td>
+                      <td className="py-3 px-2 ">{d.phone}</td>
                       <td className="py-3 px-2">{d.carType}</td>
                       <td className="py-3 px-2">{d.dateCreated}</td>
                       <td className="py-3 px-2">

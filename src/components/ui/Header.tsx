@@ -17,7 +17,7 @@ export const Header: FC<HeaderProps> = ({
   className = "",
 }) => {
   return (
-    <th className={`py-3 px-2 ${className}`}>
+    <th className={`py-3 px-2 ${className} min-w-full`}>
       {sortable ? (
         <div
           className={`flex items-center justify-between cursor-pointer font-medium ${

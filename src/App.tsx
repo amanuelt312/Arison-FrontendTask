@@ -5,11 +5,8 @@ import UserManagement from "./pages/UserManagement";
 import DriverPage from "./pages/DriverPage";
 import DriverApproval from "./pages/DriverApproval";
 import RequireAuth from "./components/auth/RequireAuth";
-import { useAuthRefresh } from "./hooks/useAuthRefresh";
 
 function App() {
-  useAuthRefresh();
-
   return (
     <>
       <BrowserRouter>

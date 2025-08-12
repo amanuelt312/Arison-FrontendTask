@@ -12,6 +12,28 @@ const getBaseUrl = (): string => {
 
 const BASE_URL = getBaseUrl();
 
+// Refresh slightly before expiry to avoid 401s due to clock skew
+const REFRESH_EARLY_MS = 30_000;
+let refreshingPromise: Promise<boolean> | null = null;
+
+async function ensureFreshToken(): Promise<boolean> {
+  const { accessToken, refreshToken, user, expiresAt } =
+    useAuthStore.getState();
+
+  if (!accessToken || !refreshToken || !user?._id) return false;
+
+  const needsRefresh =
+    typeof expiresAt === "number" && expiresAt - Date.now() <= REFRESH_EARLY_MS;
+  if (!needsRefresh) return true;
+
+  if (!refreshingPromise) {
+    refreshingPromise = refreshAccessToken().finally(() => {
+      refreshingPromise = null;
+    });
+  }
+  return refreshingPromise;
+}
+
 type ApiFetchOptions = RequestInit & {
   skipAuth?: boolean;
 };
@@ -23,16 +45,21 @@ export async function apiFetch<T>(
   const url = path.startsWith("http") ? path : `${BASE_URL}${path}`;
   const { skipAuth, headers, ...rest } = options;
 
-  const auth = useAuthStore.getState();
+  // Preflight refresh if token is near expiry
+  if (!skipAuth) {
+    await ensureFreshToken().catch(() => {});
+  }
+
+  const authNow = useAuthStore.getState();
 
   const finalHeaders: Record<string, string> = {
     "Content-Type": "application/json",
     ...(headers as Record<string, string> | undefined),
   };
 
-  if (!skipAuth && auth.accessToken) {
-    finalHeaders["Authorization"] = `${auth.tokenType || "Bearer"} ${
-      auth.accessToken
+  if (!skipAuth && authNow.accessToken) {
+    finalHeaders["Authorization"] = `${authNow.tokenType || "Bearer"} ${
+      authNow.accessToken
     }`;
   }
 
@@ -41,14 +68,14 @@ export async function apiFetch<T>(
     headers: finalHeaders,
   });
 
-  // If unauthorized, try refresh once
+  // If unauthorized, try refresh once via shared promise and retry
   if (
     response.status === 401 &&
     !options.skipAuth &&
-    auth.refreshToken &&
-    auth.user?._id
+    authNow.refreshToken &&
+    authNow.user?._id
   ) {
-    const refreshed = await refreshAccessToken();
+    const refreshed = await (refreshingPromise ?? refreshAccessToken());
     if (refreshed) {
       const authAfter = useAuthStore.getState();
       const retryHeaders: Record<string, string> = {
@@ -89,7 +116,11 @@ export async function refreshAccessToken(): Promise<boolean> {
   try {
     const res = await fetch(`${BASE_URL}/api/v1/auth/refresh-token`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        // Some backends accept refresh token in Authorization header
+        Authorization: `Bearer ${refreshToken}`,
+      },
       body: JSON.stringify({ refreshToken, userId: user._id }),
     });
 
