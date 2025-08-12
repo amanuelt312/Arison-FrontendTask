@@ -62,7 +62,6 @@ voomgo/
 
    ```bash
    git clone <repository-url>
-   cd voomgo
    ```
 
 2. **Install dependencies**
