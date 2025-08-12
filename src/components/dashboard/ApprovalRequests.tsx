@@ -1,41 +1,26 @@
 import type { FC } from "react";
 import { MoveRight } from "lucide-react";
-import { ApprovalRequestsCard, type ApprovalItem } from "./ApprovalRequestCard";
+import { ApprovalRequestsCard } from "./ApprovalRequestCard";
 import { useNavigate } from "react-router-dom";
+import { usePendingDrivers } from "../../hooks/usePendingDrivers";
 
-const items: ApprovalItem[] = [
-  {
-    id: "1",
-    name: "Nesredin Haji",
-    vehicleType: "XL Van",
-    date: "04/17/23 at 8:25 PM",
-    avatarUrl: "https://i.pravatar.cc/48?img=5",
-  },
-  {
-    id: "2",
-    name: "Nesredin Haji",
-    vehicleType: "Boda Boda",
-    date: "04/17/23 at 8:25 PM",
-    avatarUrl: "https://i.pravatar.cc/48?img=6",
-  },
-  {
-    id: "3",
-    name: "Nesredin Haji",
-    vehicleType: "Economy",
-    date: "04/17/23 at 8:25 PM",
-    avatarUrl: "https://i.pravatar.cc/48?img=7",
-  },
-  {
-    id: "4",
-    name: "Nesredin Haji",
-    vehicleType: "Delivery",
-    date: "04/17/23 at 8:25 PM",
-    avatarUrl: "https://i.pravatar.cc/48?img=8",
-  },
-];
+function formatDateTime(value: string): string {
+  const d = new Date(value);
+  return d.toLocaleString(undefined, {
+    year: "2-digit",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
 
 export const ApprovalRequests: FC = () => {
   const navigate = useNavigate();
+  const { data, isLoading } = usePendingDrivers({ page: 1, limit: 20 });
+
+  const drivers = data?.drivers ?? [];
+
   return (
     <section>
       <div className="mb-3">
@@ -44,19 +29,33 @@ export const ApprovalRequests: FC = () => {
           <h3 className="  text-gray-400">
             Manage your markets location and other informations.
           </h3>
-          <div className="bg-gray-100 rounded-lg px-1 hover:bg-gray-200 cursor-pointer">
+          <div
+            className="bg-gray-100 rounded-lg px-1 hover:bg-gray-200 cursor-pointer"
+            onClick={() => navigate("/driver-approval")}
+          >
             <MoveRight className="text-gray-500 w-4" />
           </div>
         </div>
       </div>
       <div className="space-y-3">
-        {items.map((item) => (
-          <ApprovalRequestsCard
-            key={item.id}
-            {...item}
-            onClick={() => navigate(`/driver-approval/${item.id}`)}
-          />
-        ))}
+        {isLoading && (
+          <div className="text-sm text-gray-400">Loading pending requests…</div>
+        )}
+        {!isLoading && drivers.length === 0 && (
+          <div className="text-sm text-gray-400">No pending requests</div>
+        )}
+        {!isLoading &&
+          drivers.map((d) => (
+            <ApprovalRequestsCard
+              key={d._id}
+              id={d._id}
+              name={d.fullName || "Unknown"}
+              vehicleType={d.driverProfile?.vehicleDetails?.vehicleModel || "—"}
+              date={formatDateTime(d.createdAt)}
+              avatarUrl={`https://i.pravatar.cc/48?u=${d._id}`}
+              onClick={() => navigate(`/driver-approval/${d._id}`)}
+            />
+          ))}
       </div>
     </section>
   );

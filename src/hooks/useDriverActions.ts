@@ -37,3 +37,40 @@ export function useActivateUser() {
     },
   });
 }
+
+export function useApproveDriver() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ driverId }: { driverId: string }) => {
+      return apiFetch(`/api/v1/admin/drivers/${driverId}/approve`, {
+        method: "PATCH",
+      });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["pendingDrivers"] });
+      qc.invalidateQueries({ queryKey: ["drivers"] });
+    },
+  });
+}
+
+export function useRejectDriver() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      driverId,
+      reason,
+    }: {
+      driverId: string;
+      reason?: string;
+    }) => {
+      return apiFetch(`/api/v1/admin/drivers/${driverId}/reject`, {
+        method: "PATCH",
+        body: reason ? JSON.stringify({ reason }) : undefined,
+      });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["pendingDrivers"] });
+      qc.invalidateQueries({ queryKey: ["drivers"] });
+    },
+  });
+}

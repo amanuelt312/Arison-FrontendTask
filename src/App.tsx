@@ -45,6 +45,14 @@ function App() {
             }
           />
           <Route
+            path="/driver-approval"
+            element={
+              <RequireAuth>
+                <DriverApproval />
+              </RequireAuth>
+            }
+          />
+          <Route
             path="/driver-approval/:id"
             element={
               <RequireAuth>
