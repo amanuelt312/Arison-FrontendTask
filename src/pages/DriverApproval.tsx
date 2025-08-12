@@ -1,10 +1,7 @@
 import type { FC } from "react";
 import AppLayout from "../components/layout/AppLayout";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  ApprovalRequestsCard,
-  type ApprovalItem,
-} from "../components/dashboard/ApprovalRequestCard";
+import { ApprovalRequestsCard } from "../components/dashboard/ApprovalRequestCard";
 import {
   CheckCircle2,
   CircleX,
@@ -163,7 +160,7 @@ const DriverApproval: FC = () => {
                           "—"
                         }
                         date={formatDateTime(item.createdAt)}
-                        avatarUrl={`https://i.pravatar.cc/48?u=${item._id}`}
+                        avatarUrl={item.profilePicture || ""}
                         onClick={() => navigate(`/driver-approval/${item._id}`)}
                         showMore={false}
                       />

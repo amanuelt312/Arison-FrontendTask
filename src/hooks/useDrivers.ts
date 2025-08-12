@@ -7,7 +7,7 @@ export type DriversQueryParams = {
   limit: number;
   sortBy?: string; // createdAt
   sortOrder?: "asc" | "desc";
-  search?: string; // client-side filter by name/mobile/id
+  search?: string; // server-side filter by name/mobile/id
   serviceLevelId?: string; // service id
 };
 
@@ -17,9 +17,13 @@ export function useDrivers({
   sortBy = "createdAt",
   sortOrder = "desc",
   serviceLevelId,
+  search,
 }: DriversQueryParams) {
   return useQuery({
-    queryKey: ["drivers", { page, limit, sortBy, sortOrder, serviceLevelId }],
+    queryKey: [
+      "drivers",
+      { page, limit, sortBy, sortOrder, serviceLevelId, search: search || "" },
+    ],
     queryFn: async () => {
       const params = new URLSearchParams({
         page: String(page),
@@ -30,6 +34,9 @@ export function useDrivers({
       });
       if (serviceLevelId && serviceLevelId !== "all") {
         params.set("serviceLevel", serviceLevelId);
+      }
+      if (search && search.trim().length > 0) {
+        params.set("search", search.trim());
       }
       const res = await apiFetch<UsersListResponse>(
         `/api/v1/admin/users?${params.toString()}`

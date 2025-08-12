@@ -67,6 +67,7 @@ export const DriverTable: FC = () => {
     sortBy: "createdAt",
     sortOrder: sortDirection,
     serviceLevelId: activeTab.key === "all" ? undefined : activeTab.key,
+    search: query,
   });
 
   const suspendMutation = useSuspendUser();
