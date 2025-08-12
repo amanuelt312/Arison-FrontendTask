@@ -3,6 +3,7 @@ import { MoveRight } from "lucide-react";
 import { ApprovalRequestsCard } from "./ApprovalRequestCard";
 import { useNavigate } from "react-router-dom";
 import { usePendingDrivers } from "../../hooks/usePendingDrivers";
+import { resolveMediaUrl, PLACEHOLDER_IMAGE } from "../../config/images";
 
 function formatDateTime(value: string): string {
   const d = new Date(value);
@@ -52,7 +53,7 @@ export const ApprovalRequests: FC = () => {
               name={d.fullName || "Unknown"}
               vehicleType={d.driverProfile?.vehicleDetails?.vehicleModel || "—"}
               date={formatDateTime(d.createdAt)}
-              avatarUrl={`https://i.pravatar.cc/48?u=${d._id}`}
+              avatarUrl={resolveMediaUrl(d.profilePicture) || PLACEHOLDER_IMAGE}
               onClick={() => navigate(`/driver-approval/${d._id}`)}
             />
           ))}

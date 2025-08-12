@@ -24,6 +24,7 @@ import { useDriverDetail } from "../hooks/useDriverDetail";
 import { useServices } from "../hooks/useServices";
 import carImage from "../assets/car.jpg";
 import EmptyState from "../components/ui/EmptyState";
+import { resolveMediaUrl, PLACEHOLDER_IMAGE } from "../config/images";
 
 const DriverPage: FC = () => {
   const { id } = useParams();
@@ -64,7 +65,8 @@ const DriverPage: FC = () => {
     name: user.fullName,
     email: user.email,
     phone: user.mobileNumber,
-    avatar: "https://i.pravatar.cc/80?img=11",
+    avatar:
+      resolveMediaUrl((data as any)?.user?.profilePicture) || PLACEHOLDER_IMAGE,
     country: profile?.currentLocation ? "" : "",
     userType:
       (profile?.serviceType &&
@@ -354,7 +356,7 @@ const DriverPage: FC = () => {
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-gray-500" />
                   <span className="text-gray-500">Country</span>
-                  <span className="ml-auto">-</span>
+                  <span className="ml-auto">{driver?.country || "-"}</span>
                 </div>
               </div>
               <div className="h-1 w-full bg-gray-200 my-4" />

@@ -25,7 +25,8 @@ export const DriverOverview: FC = () => {
         <StatCard
           className="col-span-1"
           title="Total Drivers"
-          value={(isLoading ? 0 : totalDrivers).toLocaleString()}
+          // value={(isLoading ? "Loading..." : totalDrivers).toLocaleString()}
+          value={2200}
           subtitle={""}
           variant="primary"
           icon={<Car className="w-8 h-8 text-primary" />}
@@ -33,19 +34,19 @@ export const DriverOverview: FC = () => {
         <StatCard
           className="col-span-1"
           title="Online Drivers"
-          value={`${onlineDrivers} Drivers`}
+          value={`320 Drivers`}
           icon={<Users className="w-6 h-6 text-primary" />}
         />
         <StatCard
           className="col-span-1"
           title="Trips in Progress"
-          value={tripsInProgress}
+          value={76}
           icon={<MapPin className="w-6 h-6 text-primary" />}
         />
         <StatCard
           className="col-span-1"
           title={"Today's New Sign-ups"}
-          value={newSignupsToday}
+          value={17}
           icon={<UserPlus className="w-6 h-6 text-primary" />}
         />
       </div>

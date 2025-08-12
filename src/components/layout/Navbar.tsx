@@ -1,10 +1,12 @@
 import type { FC } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bell, PanelRightOpen, Mail } from "lucide-react";
 import { SearchInput } from "../ui/SearchInput";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/auth";
 import { apiFetch } from "../../lib/api";
+import { useDrivers } from "../../hooks/useDrivers";
+import { resolveMediaUrl, PLACEHOLDER_IMAGE } from "../../config/images";
 
 type NavbarProps = {
   onToggleSidebar: () => void;
@@ -13,10 +15,16 @@ type NavbarProps = {
 
 export const Navbar: FC<NavbarProps> = ({ onToggleSidebar, collapsed }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [debounced, setDebounced] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const clearAuth = useAuthStore((s) => s.clearAuth);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(searchQuery.trim()), 300);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
 
   const handleLogout = async () => {
     try {
@@ -34,6 +42,17 @@ export const Navbar: FC<NavbarProps> = ({ onToggleSidebar, collapsed }) => {
     }
   };
 
+  const searchEnabled = debounced.length > 0;
+  const searchResult = useDrivers({
+    page: 1,
+    limit: 10,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+    serviceLevelId: undefined,
+    search: searchEnabled ? debounced : undefined,
+  });
+  const users = searchResult.data?.users || [];
+
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white z-50">
       <div className="h-full px-4 flex items-center gap-4 relative">
@@ -50,13 +69,54 @@ export const Navbar: FC<NavbarProps> = ({ onToggleSidebar, collapsed }) => {
           </button>
         </div>
 
-        <div className="hidden md:flex items-center gap-2 w-full max-w-xl mx-auto">
+        <div className="hidden md:flex items-center gap-2 w-full max-w-xl mx-auto relative">
           <SearchInput
             placeholder="Search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full"
           />
+          {searchQuery.trim().length > 0 && (
+            <div className="absolute left-0 right-0 top-[calc(100%+8px)] bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-96 overflow-auto">
+              {searchResult.isLoading ? (
+                <div className="p-3 text-sm text-gray-500">Searching…</div>
+              ) : users.length === 0 ? (
+                <div className="p-3 text-sm text-gray-500">No results</div>
+              ) : (
+                users.map((u) => {
+                  const avatar = resolveMediaUrl((u as any).profilePicture);
+                  return (
+                    <button
+                      key={u._id}
+                      className="w-full text-left p-3 hover:bg-gray-50 flex items-center gap-3"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => {
+                        navigate(`/drivers/${u._id}`);
+                        setSearchQuery("");
+                      }}
+                    >
+                      <img
+                        src={avatar || PLACEHOLDER_IMAGE}
+                        alt="avatar"
+                        className="w-8 h-8 rounded-md object-cover"
+                      />
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">
+                          {u.fullName || "-"}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {u.mobileNumber || "-"}
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {new Date(u.createdAt).toLocaleDateString()}
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          )}
         </div>
         <div className="flex md:hidden w-full"></div>
         <div className="flex items-center gap-2">
@@ -87,9 +147,9 @@ export const Navbar: FC<NavbarProps> = ({ onToggleSidebar, collapsed }) => {
             className="cursor-pointer"
           >
             <img
-              src="https://i.pravatar.cc/40?img=12"
+              src={resolveMediaUrl(user?.profilePicture) || PLACEHOLDER_IMAGE}
               alt="User avatar"
-              className="w-9 h-9 rounded-full"
+              className="w-9 h-9 rounded-full object-cover"
             />
           </button>
           <div

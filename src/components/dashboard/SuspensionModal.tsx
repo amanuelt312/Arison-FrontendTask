@@ -2,6 +2,7 @@ import { useState, type FC } from "react";
 import Modal from "../ui/Modal";
 import { AlertCircle, X } from "lucide-react";
 import Button from "../ui/Button";
+import { PLACEHOLDER_IMAGE } from "../../config/images";
 
 export type SuspensionModalProps = {
   open: boolean;
@@ -66,10 +67,7 @@ export const SuspensionModal: FC<SuspensionModalProps> = ({
             <AlertCircle className="w-4 h-4" />
             <span className="text-sm">You're Sending a suspension for:</span>
             <div className="flex items-center gap-2  rounded-full px-2 py-1">
-              <img
-                src="https://i.pravatar.cc/32?img=11"
-                className="w-6 h-6 rounded-full"
-              />
+              <img src={PLACEHOLDER_IMAGE} className="w-6 h-6 rounded-full" />
               <span className="text-sm font-medium">{driverName}</span>
             </div>
           </div>

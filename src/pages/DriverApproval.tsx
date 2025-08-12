@@ -14,6 +14,7 @@ import {
   type PendingDriver,
 } from "../hooks/usePendingDrivers";
 import { useApproveDriver, useRejectDriver } from "../hooks/useDriverActions";
+import { resolveMediaUrl, PLACEHOLDER_IMAGE } from "../config/images";
 
 function formatDateTime(value: string): string {
   const d = new Date(value);
@@ -160,7 +161,10 @@ const DriverApproval: FC = () => {
                           "—"
                         }
                         date={formatDateTime(item.createdAt)}
-                        avatarUrl={item.profilePicture || ""}
+                        avatarUrl={
+                          resolveMediaUrl(item.profilePicture) ||
+                          PLACEHOLDER_IMAGE
+                        }
                         onClick={() => navigate(`/driver-approval/${item._id}`)}
                         showMore={false}
                       />
@@ -212,9 +216,12 @@ const DriverApproval: FC = () => {
                   {/* Identity Header */}
                   <div className="px-4 py-4 flex items-center gap-3">
                     <img
-                      src={`https://i.pravatar.cc/72?u=${selectedDriver._id}`}
+                      src={
+                        resolveMediaUrl(selectedDriver.profilePicture) ||
+                        PLACEHOLDER_IMAGE
+                      }
                       alt="avatar"
-                      className="w-14 h-14 rounded-full"
+                      className="w-14 h-14 rounded-full object-cover"
                     />
                     <div>
                       <div className="font-semibold">

@@ -17,6 +17,7 @@ import { NavChildItem, NavItem } from "../nav/NavItem";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/auth";
 import { apiFetch } from "../../lib/api";
+import { resolveMediaUrl, PLACEHOLDER_IMAGE } from "../../config/images";
 
 export const Sidebar: FC<SidebarProps> = ({ collapsed, onToggle }) => {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
@@ -179,47 +180,52 @@ export const Sidebar: FC<SidebarProps> = ({ collapsed, onToggle }) => {
         {!collapsed ? "TOOLS" : ""}
       </div>
       <div className="px-2 space-y-2 flex-1 ">{renderNavItems(ToolItems)}</div>
-      <div className="flex flex-col gap-2">
-        <div className="flex justify-between px-2 flex-1">
-          <div className="flex items-center justify-center gap-3 relative">
-            <button
-              onClick={() => setProfileOpen((v) => !v)}
-              aria-haspopup="menu"
-              aria-expanded={profileOpen}
-            >
-              <img
-                src="https://i.pravatar.cc/40?img=12"
-                alt="User avatar"
-                className="w-9 h-9 rounded-full"
-              />
-            </button>
-            <div className="hidden sm:block leading-tight">
-              <div className="text-sm font-semibold">
-                {user?.fullName || ""}
+      {!collapsed && (
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between px-2 flex-1">
+            <div className="flex items-center justify-center gap-3 relative">
+              <button
+                onClick={() => setProfileOpen((v) => !v)}
+                aria-haspopup="menu"
+                aria-expanded={profileOpen}
+              >
+                <img
+                  src={
+                    resolveMediaUrl((user as any)?.profilePicture) ||
+                    PLACEHOLDER_IMAGE
+                  }
+                  alt="User avatar"
+                  className="w-9 h-9 rounded-full object-cover"
+                />
+              </button>
+              <div className="hidden sm:block leading-tight">
+                <div className="text-sm font-semibold">
+                  {user?.fullName || ""}
+                </div>
+                <div className="text-xs text-gray-500">{user?.role || ""}</div>
               </div>
-              <div className="text-xs text-gray-500">{user?.role || ""}</div>
+            </div>
+
+            <div
+              className="flex items-center justify-center cursor-pointer hover:text-gray-700"
+              onClick={() => setProfileOpen((v) => !v)}
+            >
+              <ChevronDown />
             </div>
           </div>
-
-          <div
-            className="flex items-center justify-center cursor-pointer hover:text-gray-700"
-            onClick={() => setProfileOpen((v) => !v)}
-          >
-            <ChevronDown />
-          </div>
+          {profileOpen && (
+            <div className=" bg-white border border-gray-200 rounded-md shadow-md  w-full">
+              <button
+                className="w-full text-left px-4 py-2 text-danger hover:bg-gray-50"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
-        {profileOpen && (
-          <div className=" bg-white border border-gray-200 rounded-md shadow-md  w-full">
-            <button
-              className="w-full text-left px-4 py-2 text-danger hover:bg-gray-50"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
-          </div>
-        )}
-      </div>
+      )}
     </aside>
   );
 };

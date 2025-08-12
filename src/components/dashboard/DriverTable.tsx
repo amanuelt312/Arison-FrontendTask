@@ -18,6 +18,7 @@ import ActivateModal from "./ActivateModal";
 import { useDrivers } from "../../hooks/useDrivers";
 import { useServices } from "../../hooks/useServices";
 import { useSuspendUser, useActivateUser } from "../../hooks/useDriverActions";
+import { resolveMediaUrl, PLACEHOLDER_IMAGE } from "../../config/images";
 
 export type Driver = {
   id: string;
@@ -114,6 +115,8 @@ export const DriverTable: FC = () => {
       ? String((u.vehicleDetails as any)?.vehicleModel || "-")
       : "-";
 
+    const avatar = resolveMediaUrl((u as any).profilePicture);
+
     return {
       id: u._id,
       name: u.fullName || "-",
@@ -121,7 +124,7 @@ export const DriverTable: FC = () => {
       carType,
       dateCreated: new Date(u.createdAt).toLocaleString(),
       status: u.status || "active",
-      avatarUrl: "https://i.pravatar.cc/40?img=11",
+      avatarUrl: avatar || PLACEHOLDER_IMAGE,
     };
   });
 
@@ -226,9 +229,9 @@ export const DriverTable: FC = () => {
                       >
                         <div className="flex items-center gap-3">
                           <img
-                            src={d.avatarUrl}
+                            src={d.avatarUrl || PLACEHOLDER_IMAGE}
                             alt="avatar"
-                            className="w-9 h-9 rounded-md"
+                            className="w-9 h-9 rounded-md object-cover"
                           />
                           <div>
                             <div className="text-xs text-primary">{d.id}</div>
