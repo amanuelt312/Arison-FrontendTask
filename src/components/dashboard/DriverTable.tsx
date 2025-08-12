@@ -233,7 +233,6 @@ export const DriverTable: FC = () => {
                             className="w-9 h-9 rounded-md object-cover"
                           />
                           <div className="">
-                            <div className="text-xs text-primary">{d.id}</div>
                             <div className="">{d.name}</div>
                           </div>
                         </div>
