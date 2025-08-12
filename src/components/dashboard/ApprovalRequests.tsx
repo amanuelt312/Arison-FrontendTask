@@ -1,10 +1,11 @@
 import type { FC } from "react";
-import { MoveRight } from "lucide-react";
+import { MoveRight, UserPlus } from "lucide-react";
 import { ApprovalRequestsCard } from "./ApprovalRequestCard";
 import { useNavigate } from "react-router-dom";
 import { usePendingDrivers } from "../../hooks/usePendingDrivers";
 import { resolveMediaUrl, PLACEHOLDER_IMAGE } from "../../config/images";
 import Loading from "../ui/Loading";
+import EmptyState from "../ui/EmptyState";
 
 function formatDateTime(value: string): string {
   const d = new Date(value);
@@ -42,7 +43,10 @@ export const ApprovalRequests: FC = () => {
       <div className="space-y-3">
         {isLoading && <Loading title="Loading pending requests…" size="sm" />}
         {!isLoading && drivers.length === 0 && (
-          <div className="text-sm text-gray-400">No pending requests</div>
+          <EmptyState
+            icon={<UserPlus className="w-6 h-6" />}
+            title="No pending requests"
+          />
         )}
         {!isLoading &&
           drivers.map((d) => (

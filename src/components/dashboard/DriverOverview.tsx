@@ -1,17 +1,8 @@
 import type { FC } from "react";
 import { Car, Users, MapPin, UserPlus } from "lucide-react";
 import { StatCard } from "./StatCard";
-import { useUserSummary } from "../../hooks/useUserSummary";
 
 export const DriverOverview: FC = () => {
-  const { data: summary, isLoading } = useUserSummary();
-
-  const totalDrivers = summary?.drivers ?? 0;
-  // Backend does not provide online/trips-in-progress/new signups; set 0 for now
-  const onlineDrivers = 0;
-  const tripsInProgress = 0;
-  const newSignupsToday = 0;
-
   return (
     <section>
       <div className="mb-3">
@@ -25,7 +16,6 @@ export const DriverOverview: FC = () => {
         <StatCard
           className="col-span-1"
           title="Total Drivers"
-          // value={(isLoading ? "Loading..." : totalDrivers).toLocaleString()}
           value={2200}
           subtitle={""}
           variant="primary"

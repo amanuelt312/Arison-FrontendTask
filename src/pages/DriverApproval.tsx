@@ -8,6 +8,7 @@ import {
   FileText,
   FileArchive,
   Trash,
+  UserPlus,
 } from "lucide-react";
 import {
   usePendingDrivers,
@@ -16,6 +17,7 @@ import {
 import { useApproveDriver, useRejectDriver } from "../hooks/useDriverActions";
 import { resolveMediaUrl, PLACEHOLDER_IMAGE } from "../config/images";
 import Loading from "../components/ui/Loading";
+import EmptyState from "../components/ui/EmptyState";
 
 function formatDateTime(value: string): string {
   const d = new Date(value);
@@ -140,9 +142,10 @@ const DriverApproval: FC = () => {
               <div className="space-y-3 ">
                 {isLoading && <Loading title="Loading…" size="sm" />}
                 {!isLoading && drivers.length === 0 && (
-                  <div className="text-sm text-gray-400">
-                    No pending requests
-                  </div>
+                  <EmptyState
+                    icon={<UserPlus className="w-6 h-6" />}
+                    title="No pending requests"
+                  />
                 )}
                 {!isLoading &&
                   drivers.map((item) => (

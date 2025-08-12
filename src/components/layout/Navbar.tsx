@@ -1,10 +1,10 @@
 import type { FC } from "react";
 import { useEffect, useState } from "react";
-import { Bell, PanelRightOpen, Mail, RefreshCcw } from "lucide-react";
+import { Bell, PanelRightOpen, Mail } from "lucide-react";
 import { SearchInput } from "../ui/SearchInput";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/auth";
-import { apiFetch, refreshAccessToken } from "../../lib/api";
+import { apiFetch } from "../../lib/api";
 import { useDrivers } from "../../hooks/useDrivers";
 import { resolveMediaUrl, PLACEHOLDER_IMAGE } from "../../config/images";
 import Loading from "../ui/Loading";
@@ -41,12 +41,6 @@ export const Navbar: FC<NavbarProps> = ({ onToggleSidebar, collapsed }) => {
       clearAuth();
       navigate("/login", { replace: true });
     }
-  };
-
-  const handleManualRefresh = async () => {
-    console.log("[auth] manual refresh clicked");
-    const ok = await refreshAccessToken();
-    console.log("[auth] manual refresh result", { ok });
   };
 
   const searchEnabled = debounced.length > 0;

@@ -83,13 +83,6 @@ voomgo/
 4. **Open your browser**
    Navigate to `http://localhost:5173`
 
-## 📜 Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-
 ## 🏗️ Build & Deployment
 
 ```bash
@@ -110,3 +103,44 @@ The built files will be in the `dist/` directory, ready for deployment.
 - **Responsive Design** - Mobile-first approach with Tailwind CSS
 - **Type Safety** - Full TypeScript implementation
 - **Modern Architecture** - React Server Components ready
+
+## Pages
+
+### Login (`/login`)
+
+- **Purpose**: Authenticate admin users.
+- **Behavior**: Validates email/password, uses React Query mutation, shows button loading state and error text.
+
+### User Management (`/user-management`)
+
+- **Purpose**: Main dashboard landing page.
+- **Contains**:
+  - `DriverOverview`: high-level driver metrics.
+  - `ApprovalRequests`: list preview of pending driver approvals with quick navigation.
+  - `DriverTable`: searchable, paginated driver list with actions (suspend/activate).
+- **States**: Uses shared `Loading` and `EmptyState` patterns where applicable.
+
+### Driver Approval (`/driver-approval`, `/driver-approval/:id`)
+
+- **Purpose**: Review and approve/decline pending driver applications.
+- **Layout**:
+  - Left: list of pending drivers.
+  - Right: contact details and documents for the selected request with Approve/Decline actions.
+- **States**:
+  - Loading via `Loading` component.
+  - Empty list via `EmptyState` with helpful messaging.
+
+### Driver Detail (`/drivers/:id`)
+
+- **Purpose**: Inspect a driver’s profile, stats, vehicle details, documents, and activity.
+- **Highlights**: Summary stats, vehicle information, documents, and tabbed sections for trips/withdrawals/ratings.
+- **States**: Loading via `Loading`, error text for failed fetches.
+
+### Drivers Alias (`/drivers`)
+
+- **Purpose**: Shortcut route that currently maps to the User Management view.
+
+### Auth & Navigation
+
+- Protected routes use `RequireAuth` to redirect unauthenticated users to `/login`.
+- API requests are centralized in `src/lib/api.ts` with automatic token refresh on 401 and preflight refresh near expiry.
