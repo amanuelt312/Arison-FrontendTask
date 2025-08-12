@@ -16,14 +16,38 @@ const BASE_URL = getBaseUrl();
 const REFRESH_EARLY_MS = 30_000;
 let refreshingPromise: Promise<boolean> | null = null;
 
+const maskToken = (token: string | null | undefined): string => {
+  if (!token) return String(token);
+  return token.length > 12
+    ? `${token.slice(0, 6)}...${token.slice(-4)}`
+    : token;
+};
+
 async function ensureFreshToken(): Promise<boolean> {
   const { accessToken, refreshToken, user, expiresAt } =
     useAuthStore.getState();
 
-  if (!accessToken || !refreshToken || !user?._id) return false;
-
+  const now = Date.now();
+  const skewMs = (expiresAt ?? 0) - now;
   const needsRefresh =
-    typeof expiresAt === "number" && expiresAt - Date.now() <= REFRESH_EARLY_MS;
+    !!accessToken &&
+    !!refreshToken &&
+    !!user?._id &&
+    typeof expiresAt === "number" &&
+    skewMs <= REFRESH_EARLY_MS;
+
+  console.log("[auth] ensureFreshToken", {
+    hasAccessToken: !!accessToken,
+    hasRefreshToken: !!refreshToken,
+    userId: user?._id,
+    expiresAt,
+    now,
+    skewMs,
+    needsRefresh,
+    inflight: !!refreshingPromise,
+  });
+
+  if (!accessToken || !refreshToken || !user?._id) return false;
   if (!needsRefresh) return true;
 
   if (!refreshingPromise) {
@@ -45,9 +69,17 @@ export async function apiFetch<T>(
   const url = path.startsWith("http") ? path : `${BASE_URL}${path}`;
   const { skipAuth, headers, ...rest } = options;
 
+  console.log("[auth] apiFetch ->", {
+    url,
+    skipAuth,
+    method: rest.method || "GET",
+  });
+
   // Preflight refresh if token is near expiry
   if (!skipAuth) {
-    await ensureFreshToken().catch(() => {});
+    await ensureFreshToken().catch((e) => {
+      console.warn("[auth] ensureFreshToken failed", e);
+    });
   }
 
   const authNow = useAuthStore.getState();
@@ -67,6 +99,7 @@ export async function apiFetch<T>(
     ...rest,
     headers: finalHeaders,
   });
+  console.log("[auth] apiFetch initial response", { status: response.status });
 
   // If unauthorized, try refresh once via shared promise and retry
   if (
@@ -75,7 +108,12 @@ export async function apiFetch<T>(
     authNow.refreshToken &&
     authNow.user?._id
   ) {
+    console.warn("[auth] 401 received; attempting refresh then retry", {
+      userId: authNow.user?._id,
+      hasRefreshToken: !!authNow.refreshToken,
+    });
     const refreshed = await (refreshingPromise ?? refreshAccessToken());
+    console.log("[auth] refresh result after 401", { refreshed });
     if (refreshed) {
       const authAfter = useAuthStore.getState();
       const retryHeaders: Record<string, string> = {
@@ -85,11 +123,13 @@ export async function apiFetch<T>(
         }`,
       };
       response = await fetch(url, { ...rest, headers: retryHeaders });
+      console.log("[auth] retry response", { status: response.status });
     }
   }
 
   // If still unauthorized, clear session for a clean redirect via guard
   if (response.status === 401 && !options.skipAuth) {
+    console.warn("[auth] still 401 after refresh attempt; clearing auth");
     const { clearAuth } = useAuthStore.getState();
     clearAuth();
   }
@@ -101,6 +141,11 @@ export async function apiFetch<T>(
       const data = await response.json();
       message = data?.message || data?.error || message;
     } catch (_) {}
+    console.error("[auth] apiFetch error", {
+      url,
+      status: response.status,
+      message,
+    });
     throw new Error(message);
   }
 
@@ -111,9 +156,20 @@ export async function apiFetch<T>(
 
 export async function refreshAccessToken(): Promise<boolean> {
   const { refreshToken, user, setAccessToken } = useAuthStore.getState();
-  if (!refreshToken || !user?._id) return false;
+  if (!refreshToken || !user?._id) {
+    console.warn("[auth] refreshAccessToken missing creds", {
+      hasRefreshToken: !!refreshToken,
+      userId: user?._id,
+    });
+    return false;
+  }
 
   try {
+    console.log("[auth] refreshAccessToken start", {
+      userId: user._id,
+      refreshToken: maskToken(refreshToken),
+    });
+
     const res = await fetch(`${BASE_URL}/api/v1/auth/refresh-token`, {
       method: "POST",
       headers: {
@@ -124,19 +180,28 @@ export async function refreshAccessToken(): Promise<boolean> {
       body: JSON.stringify({ refreshToken, userId: user._id }),
     });
 
+    console.log("[auth] refreshAccessToken response", { status: res.status });
     if (!res.ok) return false;
 
     const json: RefreshResponse = await res.json();
+    console.log("[auth] refreshAccessToken payload", {
+      success: json?.success,
+      hasAccessToken: !!json?.data?.accessToken,
+      tokenType: json?.data?.tokenType,
+      expiresIn: json?.data?.expiresIn,
+    });
+
     if (json?.success && json.data?.accessToken) {
       setAccessToken(
         json.data.accessToken,
         json.data.tokenType,
         json.data.expiresIn
       );
+      console.log("[auth] setAccessToken applied");
       return true;
     }
-  } catch (_) {
-    // Ignore and treat as failed refresh
+  } catch (e) {
+    console.error("[auth] refreshAccessToken error", e);
   }
   return false;
 }

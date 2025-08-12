@@ -2,6 +2,13 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { LoginResponse, User } from "../types/auth";
 
+const maskToken = (token: string | null | undefined): string => {
+  if (!token) return String(token);
+  return token.length > 12
+    ? `${token.slice(0, 6)}...${token.slice(-4)}`
+    : token;
+};
+
 export interface AuthState {
   user: User | null;
   accessToken: string | null;
@@ -23,6 +30,14 @@ export const useAuthStore = create<AuthState>()(
       expiresAt: null,
       setAuth: (payload) => {
         const expiresAt = Date.now() + payload.expiresIn * 1000;
+        console.log("[auth] setAuth", {
+          userId: payload.user?._id,
+          tokenType: payload.tokenType ?? "Bearer",
+          accessToken: maskToken(payload.accessToken),
+          refreshToken: maskToken(payload.refreshToken),
+          expiresIn: payload.expiresIn,
+          expiresAt,
+        });
         set({
           user: payload.user,
           accessToken: payload.accessToken,
@@ -33,6 +48,12 @@ export const useAuthStore = create<AuthState>()(
       },
       setAccessToken: (token, tokenType, expiresIn) => {
         const expiresAt = Date.now() + expiresIn * 1000;
+        console.log("[auth] setAccessToken", {
+          tokenType: tokenType ?? "Bearer",
+          accessToken: maskToken(token),
+          expiresIn,
+          expiresAt,
+        });
         set({
           accessToken: token,
           tokenType: tokenType ?? "Bearer",
@@ -40,12 +61,15 @@ export const useAuthStore = create<AuthState>()(
         });
       },
       clearAuth: () =>
-        set({
-          user: null,
-          accessToken: null,
-          refreshToken: null,
-          tokenType: null,
-          expiresAt: null,
+        set(() => {
+          console.warn("[auth] clearAuth called");
+          return {
+            user: null,
+            accessToken: null,
+            refreshToken: null,
+            tokenType: null,
+            expiresAt: null,
+          };
         }),
     }),
     {

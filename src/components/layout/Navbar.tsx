@@ -1,10 +1,10 @@
 import type { FC } from "react";
 import { useEffect, useState } from "react";
-import { Bell, PanelRightOpen, Mail } from "lucide-react";
+import { Bell, PanelRightOpen, Mail, RefreshCcw } from "lucide-react";
 import { SearchInput } from "../ui/SearchInput";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/auth";
-import { apiFetch } from "../../lib/api";
+import { apiFetch, refreshAccessToken } from "../../lib/api";
 import { useDrivers } from "../../hooks/useDrivers";
 import { resolveMediaUrl, PLACEHOLDER_IMAGE } from "../../config/images";
 import Loading from "../ui/Loading";
@@ -41,6 +41,12 @@ export const Navbar: FC<NavbarProps> = ({ onToggleSidebar, collapsed }) => {
       clearAuth();
       navigate("/login", { replace: true });
     }
+  };
+
+  const handleManualRefresh = async () => {
+    console.log("[auth] manual refresh clicked");
+    const ok = await refreshAccessToken();
+    console.log("[auth] manual refresh result", { ok });
   };
 
   const searchEnabled = debounced.length > 0;
@@ -139,6 +145,15 @@ export const Navbar: FC<NavbarProps> = ({ onToggleSidebar, collapsed }) => {
               2
             </span>
           </div>
+          {/* TEMP: Manual Refresh Button for debugging
+          <button
+            onClick={handleManualRefresh}
+            className="ml-2 p-2 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center gap-2"
+            title="Refresh token (debug)"
+          >
+            <RefreshCcw className="w-4 h-4" />
+            <span className="text-sm">Refresh</span>
+          </button> */}
         </div>
         <div className="h-[60%] w-px bg-gray-300"></div>
         <div className="flex items-center justify-end gap-3 shrink-0 relative">
