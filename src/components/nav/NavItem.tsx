@@ -62,7 +62,7 @@ export const NavChildItem: FC<{
   active: boolean;
   collapsed: boolean;
   onClick: () => void;
-}> = ({ name, path, active, collapsed, onClick }) => {
+}> = ({ name, active, collapsed, onClick }) => {
   return (
     <div className="relative">
       {/* Vertical branch line */}

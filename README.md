@@ -1,69 +1,113 @@
-# React + TypeScript + Vite
+# VoomGo 🚗
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern React-based driver management and approval system built with TypeScript and Tailwind CSS.
 
-Currently, two official plugins are available:
+## 🚀 Technologies Used
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Core Dependencies
 
-## Expanding the ESLint configuration
+- **React 19** - Latest React with concurrent features
+- **TypeScript** - Type-safe JavaScript development
+- **Vite** - Fast build tool and dev server
+- **React Router DOM** - Client-side routing
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### State Management & Data Fetching
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **Zustand** - Lightweight state management
+- **TanStack React Query** - Server state management and caching
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Styling & UI
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **Tailwind CSS** - Utility-first CSS framework
+- **Lucide React** - Beautiful icon library
+
+### Development Tools
+
+- **ESLint** - Code linting and formatting
+- **SWC** - Fast React refresh plugin
+
+## 📁 Project Structure
+
+```
+voomgo/
+├── src/
+│   ├── components/          # Reusable UI components
+│   │   ├── auth/           # Authentication components
+│   │   ├── dashboard/      # Dashboard-specific components
+│   │   ├── layout/         # Layout components (Navbar, Sidebar)
+│   │   ├── nav/            # Navigation components
+│   │   └── ui/             # Basic UI components (Button, Input, Modal)
+│   ├── hooks/              # Custom React hooks
+│   ├── lib/                # Utility libraries and API config
+│   ├── pages/              # Page components
+│   ├── store/              # Zustand store configuration
+│   ├── types/              # TypeScript type definitions
+│   ├── App.tsx            # Main application component
+│   └── main.tsx           # Application entry point
+├── public/                 # Static assets
+├── package.json            # Dependencies and scripts
+└── vite.config.ts         # Vite configuration
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠️ Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd voomgo
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **Start development server**
+
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+4. **Open your browser**
+   Navigate to `http://localhost:5173`
+
+## 📜 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+
+## 🏗️ Build & Deployment
+
+```bash
+# Build the project
+npm run build
+
+# Preview the build
+npm run preview
 ```
+
+The built files will be in the `dist/` directory, ready for deployment.
+
+## 🔧 Key Features
+
+- **Authentication System** - Protected routes with auth refresh
+- **Driver Management** - View and manage driver information
+- **Approval Workflow** - Driver approval and suspension system
+- **Responsive Design** - Mobile-first approach with Tailwind CSS
+- **Type Safety** - Full TypeScript implementation
+- **Modern Architecture** - React Server Components ready

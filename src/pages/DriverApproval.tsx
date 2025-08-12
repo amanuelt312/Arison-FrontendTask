@@ -57,7 +57,7 @@ const FileCard: FC<{
   date: string;
   type: "pdf" | "zip";
   passed?: boolean;
-}> = ({ name, size, date, type, passed = true }) => {
+}> = ({ name, size, date, type }) => {
   const Icon = type === "pdf" ? FileText : FileArchive;
   return (
     <div className="items-center gap-3 bg-white rounded-xl border border-gray-300 shadow px-3 py-2">

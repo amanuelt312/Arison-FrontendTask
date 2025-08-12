@@ -2,7 +2,6 @@ import { useState, type FC } from "react";
 import AppLayout from "../components/layout/AppLayout";
 import {
   BriefcaseBusiness,
-  CalendarDays,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -10,11 +9,9 @@ import {
   ClipboardList,
   EllipsisVertical,
   Eye,
-  FileUp,
   Folder,
   MapPin,
   MessageSquare,
-  MoreVertical,
   Phone,
   Star,
   Tags,
@@ -23,7 +20,6 @@ import {
 } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { StatCard, type StatCardProps } from "../components/dashboard/StatCard";
-import { Header } from "../components/ui/Header";
 import { useDriverDetail } from "../hooks/useDriverDetail";
 import { useServices } from "../hooks/useServices";
 import carImage from "../assets/car.jpg";
@@ -37,8 +33,6 @@ const DriverPage: FC = () => {
   const serviceIdToName = new Map<string, string>();
   servicesQuery.data?.forEach((s) => serviceIdToName.set(s._id, s.name));
 
-  const [sortField, setSortField] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [activeDetailTab, setActiveDetailTab] = useState<
     "trips" | "withdrawals" | "ratings"
