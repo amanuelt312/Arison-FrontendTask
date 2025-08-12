@@ -25,6 +25,7 @@ import { useServices } from "../hooks/useServices";
 import carImage from "../assets/car.jpg";
 import EmptyState from "../components/ui/EmptyState";
 import { resolveMediaUrl, PLACEHOLDER_IMAGE } from "../config/images";
+import Loading from "../components/ui/Loading";
 
 const DriverPage: FC = () => {
   const { id } = useParams();
@@ -42,7 +43,9 @@ const DriverPage: FC = () => {
   if (isLoading) {
     return (
       <AppLayout>
-        <div className="p-6">Loading driver...</div>
+        <div className="p-6">
+          <Loading title="Loading driver..." />
+        </div>
       </AppLayout>
     );
   }

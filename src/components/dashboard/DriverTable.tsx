@@ -19,6 +19,7 @@ import { useDrivers } from "../../hooks/useDrivers";
 import { useServices } from "../../hooks/useServices";
 import { useSuspendUser, useActivateUser } from "../../hooks/useDriverActions";
 import { resolveMediaUrl, PLACEHOLDER_IMAGE } from "../../config/images";
+import Loading from "../ui/Loading";
 
 export type Driver = {
   id: string;
@@ -182,9 +183,7 @@ export const DriverTable: FC = () => {
 
         <div className="mt-4 overflow-auto">
           {isLoading ? (
-            <div className="py-8 text-center text-gray-500">
-              Loading drivers...
-            </div>
+            <Loading title="Loading drivers..." center />
           ) : isError ? (
             <div className="py-8 text-center text-danger">
               {(error as Error)?.message || "Failed to load"}

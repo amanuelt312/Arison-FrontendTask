@@ -15,6 +15,7 @@ import {
 } from "../hooks/usePendingDrivers";
 import { useApproveDriver, useRejectDriver } from "../hooks/useDriverActions";
 import { resolveMediaUrl, PLACEHOLDER_IMAGE } from "../config/images";
+import Loading from "../components/ui/Loading";
 
 function formatDateTime(value: string): string {
   const d = new Date(value);
@@ -137,9 +138,7 @@ const DriverApproval: FC = () => {
                 </p>
               </div>
               <div className="space-y-3 ">
-                {isLoading && (
-                  <div className="text-sm text-gray-400">Loading…</div>
-                )}
+                {isLoading && <Loading title="Loading…" size="sm" />}
                 {!isLoading && drivers.length === 0 && (
                   <div className="text-sm text-gray-400">
                     No pending requests

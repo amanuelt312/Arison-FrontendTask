@@ -7,6 +7,7 @@ import { useAuthStore } from "../../store/auth";
 import { apiFetch } from "../../lib/api";
 import { useDrivers } from "../../hooks/useDrivers";
 import { resolveMediaUrl, PLACEHOLDER_IMAGE } from "../../config/images";
+import Loading from "../ui/Loading";
 
 type NavbarProps = {
   onToggleSidebar: () => void;
@@ -79,7 +80,9 @@ export const Navbar: FC<NavbarProps> = ({ onToggleSidebar, collapsed }) => {
           {searchQuery.trim().length > 0 && (
             <div className="absolute left-0 right-0 top-[calc(100%+8px)] bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-96 overflow-auto">
               {searchResult.isLoading ? (
-                <div className="p-3 text-sm text-gray-500">Searching…</div>
+                <div className="p-3">
+                  <Loading title="Searching…" size="sm" />
+                </div>
               ) : users.length === 0 ? (
                 <div className="p-3 text-sm text-gray-500">No results</div>
               ) : (
