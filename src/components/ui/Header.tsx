@@ -17,15 +17,15 @@ export const Header: FC<HeaderProps> = ({
   className = "",
 }) => {
   return (
-    <th className={`py-3 px-2 ${className} min-w-full`}>
+    <th className={`py-3 px-2 ${className} min-w-full whitespace-nowrap`}>
       {sortable ? (
         <div
-          className={`flex items-center justify-between cursor-pointer font-medium ${
+          className={`flex  items-center justify-between cursor-pointer font-medium ${
             onClick ? "hover:text-primary" : ""
           }`}
           onClick={onClick}
         >
-          <span className={`${isActive ? "text-primary" : "text-gray-500"}`}>
+          <span className={`${isActive ? "text-primary" : "text-gray-500"} `}>
             {label}
           </span>
           <ChevronsUpDown

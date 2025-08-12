@@ -169,7 +169,7 @@ export const DriverTable: FC = () => {
                   setActiveTab(t);
                   setPage(1);
                 }}
-                className={`text-sm font-bold px-2 py-1 rounded-2xl cursor-pointer ${
+                className={`shrink-0 text-sm md:font-bold px-2 py-1 rounded-2xl cursor-pointer ${
                   activeTab.key === t.key
                     ? "bg-primary/10 text-primary"
                     : "text-gray-400 hover:bg-gray-100"
